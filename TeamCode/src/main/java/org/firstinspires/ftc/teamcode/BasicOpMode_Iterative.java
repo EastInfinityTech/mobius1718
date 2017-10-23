@@ -33,20 +33,21 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-/**
+/**Random comment
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
  * The names of OpModes appear on the menu of the FTC Driver Station.
  * When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * when we wanted to eat our potatoes, mr. ladida stopped us.
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all iterative OpModes contain.
- *
+ * Haha you found this.  Good for you /_(*-*)_/
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
@@ -84,6 +85,9 @@ public class BasicOpMode_Iterative extends OpMode
         // Reverse the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        elevatorMotor.setDirection(DcMotor.Direction.FORWARD);
+        armServo.setDirection(Servo.Direction.FORWARD);
+        jewelServo.setDirection(Servo.Direction.FORWARD);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -95,6 +99,9 @@ public class BasicOpMode_Iterative extends OpMode
     @Override
     public void init_loop() {
     }
+    /* I commented this because I had nothing better to do
+    /
+     */
 
     /*
      * Code to run ONCE when the driver hits PLAY
@@ -112,6 +119,12 @@ public class BasicOpMode_Iterative extends OpMode
         // Setup a variable for each drive wheel to save power level for telemetry
         double leftPower;
         double rightPower;
+        boolean elevatorUp ;
+        boolean elevatorDown ;
+        boolean armOpen ;
+        boolean armClose ;
+        boolean jewelUp ;
+        boolean jewelDown ;
 
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
@@ -127,10 +140,46 @@ public class BasicOpMode_Iterative extends OpMode
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
          leftPower  = -gamepad1.left_stick_y ;
          rightPower = -gamepad1.right_stick_y ;
+        elevatorUp = gamepad1.dpad_up ;
+        elevatorDown = gamepad1.dpad_down ;
+        armOpen = gamepad1.a ;
+        armClose = gamepad1.b ;
+        jewelUp = gamepad1.x ;
+        jewelDown = gamepad1.y ;
 
         // Send calculated power to wheels
         leftDrive.setPower(leftPower);
         rightDrive.setPower(rightPower);
+        // elevator going up and down
+        if(elevatorUp){
+            elevatorMotor.setPower (.5);
+        }
+        else if(elevatorDown){
+            elevatorMotor.setPower (-.5);
+        }
+        else {
+            elevatorMotor.setPower (0);
+        }
+        //grab the glyph
+        if(armOpen){
+            armServo.setPosition(.5);
+        }
+        else if (armClose){
+            armServo.setPosition(-.5);
+        }
+        else{
+            armServo.setPosition(0);
+        }
+        //jewel knocker comes down
+        if(jewelUp){
+            jewelServo.setPosition(.5);
+        }
+        else if (jewelDown){
+            jewelServo.setPosition(-.5);
+        }
+        else{
+            jewelServo.setPosition(0);
+        }
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
