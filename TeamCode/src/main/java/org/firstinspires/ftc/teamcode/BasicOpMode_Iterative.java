@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+
 /**Random comment
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -137,7 +138,7 @@ public class BasicOpMode_Iterative extends OpMode
         //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
         // Tank Mode uses one stick to control each wheel.
-        // - This requires no math, but it is hard to drive forward slowly and keep straight.
+        // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
          leftPower  = -gamepad1.left_stick_y ;
          rightPower = -gamepad1.right_stick_y ;
         elevatorUp = gamepad1.dpad_up ;
@@ -162,7 +163,7 @@ public class BasicOpMode_Iterative extends OpMode
         }
         //grab the glyph
         if(armOpen){
-            armServo.setPosition(.5);
+            armServo.setPosition(.75);
         }
         else if (armClose){
             armServo.setPosition(-.5);
@@ -175,7 +176,7 @@ public class BasicOpMode_Iterative extends OpMode
             jewelServo.setPosition(.5);
         }
         else if (jewelDown){
-            jewelServo.setPosition(-.5);
+            jewelServo.setPosition(-.25);
         }
         else{
             jewelServo.setPosition(0);
