@@ -29,11 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -55,7 +53,7 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="Basic: Iterative OpMode", group="Iterative Opmode")
 //@Disabled
-public class BasicOpMode_Iterative extends OpMode
+public class _Test_ArcadeDrive extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -98,7 +96,8 @@ public class BasicOpMode_Iterative extends OpMode
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
     @Override
-    public void init_loop() {
+    public void init_loop(){
+
     }
     /* I commented this because I had nothing better to do
     /
@@ -120,38 +119,34 @@ public class BasicOpMode_Iterative extends OpMode
         // Setup a variable for each drive wheel to save power level for telemetry
         double leftPower;
         double rightPower;
-        boolean elevatorUp ;
-        boolean elevatorDown ;
-        boolean armOpen ;
-        boolean armClose ;
-        boolean jewelUp ;
-        boolean jewelDown ;
+        boolean elevatorUp;
+        boolean elevatorDown;
+        boolean armOpen;
+        boolean armClose;
+        boolean jewelUp;
+        boolean jewelDown;
 
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
 
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
-        //double drive = -gamepad1.left_stick_y;
-        //double turn  =  gamepad1.right_stick_x;
-        //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-        //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+        double drive = gamepad1.left_stick_y;
+        double turn  =  gamepad1.right_stick_x;
+        leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+        rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+        elevatorUp = gamepad1.dpad_up;
+        elevatorDown = gamepad1.dpad_down;
+        armOpen = gamepad1.a;
+        armClose = gamepad1.b;
+        jewelUp = gamepad1.x;
+        jewelDown = gamepad1.y;
 
-        // Tank Mode uses one stick to control each wheel.
-        // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
-         leftPower  = -gamepad1.left_stick_y ;
-         rightPower = -gamepad1.right_stick_y ;
-        elevatorUp = gamepad1.dpad_up ;
-        elevatorDown = gamepad1.dpad_down ;
-        armOpen = gamepad1.a ;
-        armClose = gamepad1.b ;
-        jewelUp = gamepad1.x ;
-        jewelDown = gamepad1.y ;
-
-        // Send calculated power to wheels
+        // Send calculated power to wheels from controller
         leftDrive.setPower(leftPower);
         rightDrive.setPower(rightPower);
-        // elevator going up and down
+
+        //Elevator Mechanism
         if(elevatorUp){
             elevatorMotor.setPower (.5);
         }
@@ -161,7 +156,8 @@ public class BasicOpMode_Iterative extends OpMode
         else {
             elevatorMotor.setPower (0);
         }
-        //grab the glyph
+
+        //Glyph Mechanism
         if(armOpen){
             armServo.setPosition(.75);
         }
@@ -171,7 +167,8 @@ public class BasicOpMode_Iterative extends OpMode
         else{
             armServo.setPosition(0);
         }
-        //jewel knocker comes down
+
+        //Jewel Knocker
         if(jewelUp){
             jewelServo.setPosition(.5);
         }
