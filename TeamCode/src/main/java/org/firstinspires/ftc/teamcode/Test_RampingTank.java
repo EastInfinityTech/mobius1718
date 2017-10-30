@@ -128,10 +128,10 @@ public class Test_RampingTank extends OpMode
         double rightPower;
         boolean elevatorUp;
         boolean elevatorDown;
-        boolean armOpen;
-        boolean armClose;
+        boolean armToggle;
         boolean jewelUp;
         boolean jewelDown;
+        boolean isArmOpen = true;
 
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
@@ -139,8 +139,7 @@ public class Test_RampingTank extends OpMode
         rightPower = gamepad1.right_stick_y;
         elevatorUp = gamepad1.dpad_up;
         elevatorDown = gamepad1.dpad_down;
-        armOpen = gamepad1.a;
-        armClose = gamepad1.b;
+        armToggle = gamepad1.a;
         jewelUp = gamepad1.x;
         jewelDown = gamepad1.y;
 
@@ -167,21 +166,23 @@ public class Test_RampingTank extends OpMode
 
         //Elevator Mechanism
         if(elevatorUp){
-            elevatorMotor.setPower (.5);
+            elevatorMotor.setPower(1);
         }
         else if(elevatorDown){
-            elevatorMotor.setPower (-.5);
+            elevatorMotor.setPower(-1);
         }
         else {
-            elevatorMotor.setPower (0);
+            elevatorMotor.setPower(0);
         }
 
         //Glyph Mechanism
-        if(armOpen){
-            armServo.setPosition(.75);
+        if(armToggle && (isArmOpen == false)){
+            armServo.setPosition(.5);
+            isArmOpen = true;
         }
-        else if (armClose){
+        else if(armToggle && (isArmOpen == true)){
             armServo.setPosition(-.5);
+            isArmOpen = false;
         }
         else{
             armServo.setPosition(0);

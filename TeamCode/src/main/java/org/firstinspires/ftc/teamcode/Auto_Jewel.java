@@ -97,6 +97,8 @@ public class Auto_Jewel extends LinearOpMode {
             leftDrive.setPower(-.5);
             rightDrive.setPower(-.5);
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
 
         jewelServo.setPosition(-.25);
         jewelColor = colorSensor.red();
