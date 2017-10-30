@@ -29,9 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -51,9 +53,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Arcade Drive", group="Iterative Opmode")
+@TeleOp(name="!!TEST!! Ramping Tank", group="Iterative Opmode")
 //@Disabled
-public class _Test_ArcadeDrive extends OpMode
+public class Test_RampingTank extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -62,6 +64,12 @@ public class _Test_ArcadeDrive extends OpMode
     private Servo armServo = null;
     private DcMotor elevatorMotor = null;
     private Servo jewelServo = null;
+
+    static final double INCREMENT   = 0.01;     // amount to ramp motor each CYCLE_MS cycle
+    static final double MAX_FWD     =  1.0;     // Maximum FWD power applied to motor
+    static final double MAX_REV     = -1.0;     // Maximum REV power applied to motor
+    double  power   = 0;
+    boolean rampUp  = true;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -96,8 +104,7 @@ public class _Test_ArcadeDrive extends OpMode
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
     @Override
-    public void init_loop(){
-
+    public void init_loop() {
     }
     /* I commented this because I had nothing better to do
     /
@@ -126,15 +133,10 @@ public class _Test_ArcadeDrive extends OpMode
         boolean jewelUp;
         boolean jewelDown;
 
-        // Choose to drive using either Tank Mode, or POV Mode
-        // Comment out the method that's not used.  The default below is POV.
-
-        // POV Mode uses left stick to go forward, and right stick to turn.
-        // - This uses basic math to combine motions and is easier to drive straight.
-        double drive = gamepad1.left_stick_y;
-        double turn  = -gamepad1.right_stick_x;
-        leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-        rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+        // Tank Mode uses one stick to control each wheel.
+        // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
+        leftPower  = gamepad1.left_stick_y;
+        rightPower = gamepad1.right_stick_y;
         elevatorUp = gamepad1.dpad_up;
         elevatorDown = gamepad1.dpad_down;
         armOpen = gamepad1.a;
@@ -142,9 +144,26 @@ public class _Test_ArcadeDrive extends OpMode
         jewelUp = gamepad1.x;
         jewelDown = gamepad1.y;
 
-        // Send calculated power to wheels from controller
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
+
+        if (Math.abs(leftPower + rightPower) >= .01) {
+            // Keep stepping up until we hit the max value.
+            power += INCREMENT ;
+            if (power >= MAX_FWD ) {
+                power = MAX_FWD;
+                rampUp = !rampUp;   // Switch ramp direction
+            }
+        }
+        else {
+            // Keep stepping down until we hit the min value.
+            power -= INCREMENT ;
+            if (power <= MAX_REV ) {
+                power = MAX_REV;
+                rampUp = !rampUp;  // Switch ramp direction
+            }
+        }
+
+        leftDrive.setPower(leftPower*power);
+        rightDrive.setPower(rightPower*power);
 
         //Elevator Mechanism
         if(elevatorUp){
@@ -181,7 +200,7 @@ public class _Test_ArcadeDrive extends OpMode
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower*power, rightPower*power);
     }
 
     /*
