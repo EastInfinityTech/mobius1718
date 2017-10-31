@@ -125,7 +125,8 @@ public class Default_TankDrive extends OpMode
         double rightPower;
         boolean elevatorUp;
         boolean elevatorDown;
-        boolean armToggle;
+        boolean armOpen;
+        boolean armClose;
         boolean jewelUp;
         boolean jewelDown;
 
@@ -135,7 +136,8 @@ public class Default_TankDrive extends OpMode
         rightPower = gamepad1.right_stick_y;
         elevatorUp = gamepad1.dpad_up;
         elevatorDown = gamepad1.dpad_down;
-        armToggle = gamepad1.a;
+        armOpen = gamepad1.a;
+        armClose = gamepad1.x;
 
 
         leftDrive.setPower(leftPower);
@@ -153,16 +155,11 @@ public class Default_TankDrive extends OpMode
         }
 
         //Glyph Mechanism
-        if(armToggle && (isArmOpen == false)){
+        if(armOpen){
             armServo.setPosition(.5);
-            isArmOpen = true;
         }
-        else if(armToggle && (isArmOpen == true)){
+        else if(armClose){
             armServo.setPosition(-.5);
-            isArmOpen = false;
-        }
-        else {
-            armServo.setPosition(0);
         }
 
         // Show the elapsed game time and wheel power.
