@@ -70,6 +70,8 @@ public class Test_RampingTank extends OpMode
     static final double MAX_REV     = -1.0;     // Maximum REV power applied to motor
     double  power   = 0;
     boolean rampUp  = true;
+    boolean isArmOpen = true;
+
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -90,8 +92,8 @@ public class Test_RampingTank extends OpMode
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
         elevatorMotor.setDirection(DcMotor.Direction.FORWARD);
         armServo.setDirection(Servo.Direction.FORWARD);
         jewelServo.setDirection(Servo.Direction.FORWARD);
@@ -131,8 +133,6 @@ public class Test_RampingTank extends OpMode
         boolean armToggle;
         boolean jewelUp;
         boolean jewelDown;
-        boolean isArmOpen = true;
-
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
         leftPower  = gamepad1.left_stick_y;

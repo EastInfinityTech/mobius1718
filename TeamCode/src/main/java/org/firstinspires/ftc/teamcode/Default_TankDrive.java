@@ -64,6 +64,8 @@ public class Default_TankDrive extends OpMode
     private Servo armServo = null;
     private DcMotor elevatorMotor = null;
     private Servo jewelServo = null;
+    boolean isArmOpen = true;
+
 
 
     /*
@@ -123,8 +125,7 @@ public class Default_TankDrive extends OpMode
         double rightPower;
         boolean elevatorUp;
         boolean elevatorDown;
-        boolean armOpen;
-        boolean armClose;
+        boolean armToggle;
         boolean jewelUp;
         boolean jewelDown;
 
@@ -134,10 +135,7 @@ public class Default_TankDrive extends OpMode
         rightPower = gamepad1.right_stick_y;
         elevatorUp = gamepad1.dpad_up;
         elevatorDown = gamepad1.dpad_down;
-        armOpen = gamepad1.a;
-        armClose = gamepad1.b;
-        jewelUp = gamepad1.x;
-        jewelDown = gamepad1.y;
+        armToggle = gamepad1.a;
 
 
         leftDrive.setPower(leftPower);
@@ -155,25 +153,16 @@ public class Default_TankDrive extends OpMode
         }
 
         //Glyph Mechanism
-        if(armOpen){
-            armServo.setPosition(.75);
+        if(armToggle && (isArmOpen == false)){
+            armServo.setPosition(.5);
+            isArmOpen = true;
         }
-        else if (armClose){
+        else if(armToggle && (isArmOpen == true)){
             armServo.setPosition(-.5);
+            isArmOpen = false;
         }
-        else{
+        else {
             armServo.setPosition(0);
-        }
-
-        //Jewel Knocker
-        if(jewelUp){
-            jewelServo.setPosition(.5);
-        }
-        else if (jewelDown){
-            jewelServo.setPosition(-.25);
-        }
-        else{
-            jewelServo.setPosition(0);
         }
 
         // Show the elapsed game time and wheel power.
