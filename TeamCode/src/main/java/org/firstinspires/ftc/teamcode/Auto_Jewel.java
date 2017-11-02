@@ -69,9 +69,12 @@ public abstract class Auto_Jewel extends LinearOpMode {
     protected ColorSensor colorSensor = null;
     protected Servo jewelServo = null;
     protected Servo armServo = null;
-    protected int jewelColor;
+    private int jewelColor;
     protected boolean areWeRed = false;
     protected boolean areWeFront = false;
+
+    private double powerValueforSpeedPlus=0;
+    private double powerValueforSpeedReverse=0;
 
     public void runOpModeMain() {
 
@@ -97,82 +100,102 @@ public abstract class Auto_Jewel extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        powerValueforSpeedPlus=0.20;
+        powerValueforSpeedReverse=powerValueforSpeedPlus*(-1);
         runtime.reset();
-        while (runtime.seconds() < 1) { //Move backward for 1 second
-            leftDrive.setPower(-.20);
-            rightDrive.setPower(-.20);
+        while (runtime.milliseconds()  < 200) { //Move backward for 1 second
+            leftDrive.setPower(powerValueforSpeedReverse);
+            rightDrive.setPower(powerValueforSpeedReverse);
         }
+        telemetry.addData("Status", "Went Back now Put Servo Down.");    //
+        telemetry.update();
+
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
-        jewelServo.setPosition(-.25);
+        jewelServo.setPosition(powerValueforSpeedReverse);
         jewelColor = colorSensor.red();
+
+        powerValueforSpeedPlus=0;
+        powerValueforSpeedReverse=0;
+
 
         runtime.reset();
         if (jewelColor >= 100) { //Red
             while (runtime.seconds() < 2) { //Turn in direction of red jewel
-                rightDrive.setPower(.20);
-                leftDrive.setPower(-.20);
+                rightDrive.setPower(powerValueforSpeedPlus);
+                leftDrive.setPower(powerValueforSpeedReverse);
             }
         }
         else{ //Blue
             while(runtime.seconds() < 2) { //Turn in direction of red jewel
-                rightDrive.setPower(-.20);
-                leftDrive.setPower(.20);
+                rightDrive.setPower(powerValueforSpeedReverse);
+                leftDrive.setPower(powerValueforSpeedPlus);
             }
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
 
         jewelServo.setPosition(.25);
 
         if (jewelColor >= 100) { //Red
             while (runtime.seconds() < 2) { //Turn back to original position
-                rightDrive.setPower(-.20);
-                leftDrive.setPower(.20);
+                rightDrive.setPower(powerValueforSpeedReverse);
+                leftDrive.setPower(powerValueforSpeedPlus);
             }
         }
         else{ //Blue
             while(runtime.seconds() < 2) { //Turn back to original position
-                rightDrive.setPower(.20);
-                leftDrive.setPower(-.20);
+                rightDrive.setPower(powerValueforSpeedPlus);
+                leftDrive.setPower(powerValueforSpeedReverse);
             }
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
 
         // Go Straight Ahead and out of Balancing Platform
         runtime.reset();
         while(runtime.seconds() < 4) { //Straight ahead for 4 second
-            rightDrive.setPower(.20);
-            leftDrive.setPower(.20);
+            rightDrive.setPower(powerValueforSpeedPlus);
+            leftDrive.setPower(powerValueforSpeedPlus);
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+
         // Turn to Left or Right
         runtime.reset();
         while(runtime.seconds() < 2) { //Straight ahead for 4 second
             if (areWeRed) {
-                rightDrive.setPower(.20);
-                leftDrive.setPower(-.20);
+                rightDrive.setPower(powerValueforSpeedPlus);
+                leftDrive.setPower(powerValueforSpeedReverse);
             }
             else {
-                leftDrive.setPower(.20);
-                rightDrive.setPower(-.20);
+                leftDrive.setPower(powerValueforSpeedPlus);
+                rightDrive.setPower(powerValueforSpeedReverse);
             }
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
 
         // Go Straight Ahead
         runtime.reset();
         while(runtime.seconds() < 4) { //Straight ahead for 4 seconds
-            rightDrive.setPower(.20);
-            leftDrive.setPower(.20);
+            rightDrive.setPower(powerValueforSpeedPlus);
+            leftDrive.setPower(powerValueforSpeedPlus);
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
 
         runtime.reset();
         if (areWeFront) {
             while (runtime.seconds() < 2) { //Turn again for Front
-                rightDrive.setPower(.20);
-                leftDrive.setPower(-.20);
+                rightDrive.setPower(powerValueforSpeedPlus);
+                leftDrive.setPower(powerValueforSpeedReverse);
             }
             runtime.reset();
             while(runtime.seconds() < 4) { //Straight ahead for 4 seconds
-                rightDrive.setPower(.20);
-                leftDrive.setPower(.20);
+                rightDrive.setPower(powerValueforSpeedPlus);
+                leftDrive.setPower(powerValueforSpeedPlus);
             }
         }
 
