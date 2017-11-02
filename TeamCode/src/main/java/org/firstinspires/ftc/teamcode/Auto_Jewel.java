@@ -97,8 +97,8 @@ public class Auto_Jewel extends LinearOpMode {
 
         runtime.reset();
         while (runtime.seconds() < 1) { //Move backward for 1 second
-            leftDrive.setPower(-.5);
-            rightDrive.setPower(-.5);
+            leftDrive.setPower(-.20);
+            rightDrive.setPower(-.20);
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
@@ -109,14 +109,14 @@ public class Auto_Jewel extends LinearOpMode {
         runtime.reset();
         if (jewelColor >= 100) { //Red
             while (runtime.seconds() < 2) { //Turn in direction of red jewel
-                rightDrive.setPower(.5);
-                leftDrive.setPower(-.5);
+                rightDrive.setPower(.20);
+                leftDrive.setPower(-.20);
             }
         }
         else{ //Blue
             while(runtime.seconds() < 2) { //Turn in direction of red jewel
-                rightDrive.setPower(-.5);
-                leftDrive.setPower(.5);
+                rightDrive.setPower(-.20);
+                leftDrive.setPower(.20);
             }
         }
 
@@ -125,23 +125,23 @@ public class Auto_Jewel extends LinearOpMode {
         // Go Straight Ahead and out of Balancing Platform
         runtime.reset();
         while(runtime.seconds() < 4) { //Straight ahead for 4 second
-            rightDrive.setPower(.5);
-            leftDrive.setPower(.5);
+            rightDrive.setPower(.20);
+            leftDrive.setPower(.20);
         }
         // Turn to Left or Right
         runtime.reset();
         while(runtime.seconds() < 2) { //Straight ahead for 4 second
             if (areWeRed)
-                rightDrive.setPower(.5);
+                rightDrive.setPower(.20);
             else
-                leftDrive.setPower(.5);
+                leftDrive.setPower(.20);
         }
 
         // Go Straight Ahead
         runtime.reset();
         while(runtime.seconds() < 4) { //Straight ahead for 4 seconds
-            rightDrive.setPower(.5);
-            leftDrive.setPower(.5);
+            rightDrive.setPower(.20);
+            leftDrive.setPower(.20);
         }
 
         rightDrive.setPower(0);
