@@ -92,6 +92,30 @@ public class Auto_Jewel extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        /* Go Back 1 sec
+            Servo Down
+            Sensor
+            Turn One way
+            Servo Down
+            Reverse Turn
+            Move forward 2 sec
+
+            if Red Team
+                turn indicator right
+            else
+                turn indicator Left
+
+           Turn as per indicator (reverse drive)
+           go 1 sec
+
+           if Front
+                Turn as per indicator (reverse drive)
+                go 2 sec
+
+            Open Jaws
+         */
+
+
         int jewelColor;
         boolean areWeRed = true;
 
