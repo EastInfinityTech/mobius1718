@@ -69,7 +69,7 @@ public class Auto_Jewel extends LinearOpMode {
     private DcMotor rightDrive = null;
     private ColorSensor colorSensor = null;
     private Servo jewelServo = null;
-
+    private Servo armServo = null;
     @Override
     public void runOpMode() {
 
@@ -77,13 +77,15 @@ public class Auto_Jewel extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
+        rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
+        armServo = hardwareMap.get(Servo.class, "armServo");
         jewelServo = hardwareMap.get(Servo.class, "jewelServo");
+        colorSensor = hardwareMap.get(ColorSensor.class,"ColorSensor");
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
         jewelServo.setDirection(Servo.Direction.FORWARD);
-        // Send telemetry message to signify robot waiting;
+        // Send telemetry message to signify robot waiting; Can I check in
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
@@ -91,6 +93,7 @@ public class Auto_Jewel extends LinearOpMode {
         waitForStart();
 
         int jewelColor;
+        boolean areWeRed = true;
 
         runtime.reset();
         while (runtime.seconds() < 1) { //Move backward for 1 second
@@ -104,18 +107,43 @@ public class Auto_Jewel extends LinearOpMode {
         jewelColor = colorSensor.red();
 
         runtime.reset();
-        while(runtime.seconds() < 2) { //Turn in direction of red jewel
-            if (jewelColor >= 100) { //Red
+        if (jewelColor >= 100) { //Red
+            while (runtime.seconds() < 2) { //Turn in direction of red jewel
                 rightDrive.setPower(.5);
                 leftDrive.setPower(-.5);
             }
-            else if (jewelColor < 100) { //Blue
+        }
+        else{ //Blue
+            while(runtime.seconds() < 2) { //Turn in direction of red jewel
                 rightDrive.setPower(-.5);
                 leftDrive.setPower(.5);
             }
         }
 
         jewelServo.setPosition(.25);
+
+        // Go Straight Ahead and out of Balancing Platform
+        runtime.reset();
+        while(runtime.seconds() < 4) { //Straight ahead for 4 second
+            rightDrive.setPower(.5);
+            leftDrive.setPower(.5);
+        }
+        // Turn to Left or Right
+        runtime.reset();
+        while(runtime.seconds() < 2) { //Straight ahead for 4 second
+            if (areWeRed)
+                rightDrive.setPower(.5);
+            else
+                leftDrive.setPower(.5);
+        }
+
+        // Go Straight Ahead
+        runtime.reset();
+        while(runtime.seconds() < 4) { //Straight ahead for 4 seconds
+            rightDrive.setPower(.5);
+            leftDrive.setPower(.5);
+        }
+
         rightDrive.setPower(0);
         leftDrive.setPower(0);
         requestOpModeStop();
