@@ -60,23 +60,27 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto: Jewel Knock", group="Auton")
 //@Disabled
-public class Auto_Jewel extends LinearOpMode {
+public abstract class Auto_Jewel extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-    private ColorSensor colorSensor = null;
-    private Servo jewelServo = null;
-    private Servo armServo = null;
-    @Override
-    public void runOpMode() {
+    protected ElapsedTime runtime = new ElapsedTime();
+    protected DcMotor leftDrive = null;
+    protected DcMotor rightDrive = null;
+    protected ColorSensor colorSensor = null;
+    protected Servo jewelServo = null;
+    protected Servo armServo = null;
+    protected int jewelColor;
+    protected boolean areWeRed = false;
+    protected boolean areWeFront = false;
+
+    public void runOpModeMain() {
 
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
+        telemetry.addData("Status", "In the Common Routine");    //
+        telemetry.update();
         leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         armServo = hardwareMap.get(Servo.class, "armServo");
@@ -86,38 +90,12 @@ public class Auto_Jewel extends LinearOpMode {
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
         jewelServo.setDirection(Servo.Direction.FORWARD);
         // Send telemetry message to signify robot waiting; Can I check in
+
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
-        /* Go Back 1 sec
-            Servo Down
-            Sensor
-            Turn One way
-            Servo Down
-            Reverse Turn
-            Move forward 2 sec
-
-            if Red Team
-                turn indicator right
-            else
-                turn indicator Left
-
-           Turn as per indicator (reverse drive)
-           go 1 sec
-
-           if Front
-                Turn as per indicator (reverse drive)
-                go 2 sec
-
-            Open Jaws
-         */
-
-
-        int jewelColor;
-        boolean areWeRed = true;
 
         runtime.reset();
         while (runtime.seconds() < 1) { //Move backward for 1 second
@@ -146,6 +124,19 @@ public class Auto_Jewel extends LinearOpMode {
 
         jewelServo.setPosition(.25);
 
+        if (jewelColor >= 100) { //Red
+            while (runtime.seconds() < 2) { //Turn back to original position
+                rightDrive.setPower(-.20);
+                leftDrive.setPower(.20);
+            }
+        }
+        else{ //Blue
+            while(runtime.seconds() < 2) { //Turn back to original position
+                rightDrive.setPower(.20);
+                leftDrive.setPower(-.20);
+            }
+        }
+
         // Go Straight Ahead and out of Balancing Platform
         runtime.reset();
         while(runtime.seconds() < 4) { //Straight ahead for 4 second
@@ -155,10 +146,14 @@ public class Auto_Jewel extends LinearOpMode {
         // Turn to Left or Right
         runtime.reset();
         while(runtime.seconds() < 2) { //Straight ahead for 4 second
-            if (areWeRed)
+            if (areWeRed) {
                 rightDrive.setPower(.20);
-            else
+                leftDrive.setPower(-.20);
+            }
+            else {
                 leftDrive.setPower(.20);
+                rightDrive.setPower(-.20);
+            }
         }
 
         // Go Straight Ahead
@@ -167,6 +162,20 @@ public class Auto_Jewel extends LinearOpMode {
             rightDrive.setPower(.20);
             leftDrive.setPower(.20);
         }
+
+        runtime.reset();
+        if (areWeFront) {
+            while (runtime.seconds() < 2) { //Turn again for Front
+                rightDrive.setPower(.20);
+                leftDrive.setPower(-.20);
+            }
+            runtime.reset();
+            while(runtime.seconds() < 4) { //Straight ahead for 4 seconds
+                rightDrive.setPower(.20);
+                leftDrive.setPower(.20);
+            }
+        }
+
 
         rightDrive.setPower(0);
         leftDrive.setPower(0);
