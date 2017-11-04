@@ -71,10 +71,8 @@ public abstract class Auto_Jewel extends LinearOpMode {
     protected Servo armServo = null;
     private int jewelColor;
     private int timeFor90DegreeTurnMs = 1325;
-    private int timeForTENInches = 300;
-    private int timetoMoveBeforeFirstTurn=0;
-    private int timetoMoveAfterFirstTurn=0;
-    private int timetoMoveAfterSecondTurn=0;
+    private int timetoMoveForwardFirst=0;
+    private int timetoMoveAfterTurn=0;
     protected boolean areWeRed = false;
     protected boolean areWeFront = false;
 
@@ -103,14 +101,25 @@ public abstract class Auto_Jewel extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         powerValueforSpeedPlus=0;
-        timetoMoveBeforeFirstTurn= timeForTENInches*10/10;
-        timetoMoveAfterFirstTurn = timeForTENInches*21/10;
-        timetoMoveAfterSecondTurn= timeForTENInches*15/10;
 
+        /* These are our observations for the relationship between time and distance travelled.
+        *  If we assume this to be distance = Time * Factor + Constant
+        *  Here Constant is the offset for the inital momentum
+        *  Readings are as below on the test field:
+        *  1000Ms we go between 14 1/4 to 14 1/2 inches (5 samples)
+        *  2000Ms we go between 28 7/8 to  29 3/8 inches
+        *  3000 Ms we go 44 3/8 inches
+        *
+        *  With Appoximation we get Time = 200/3 * (distance+0.77)
+        */
 
+        timetoMoveForwardFirst = (int)(200*(21+0.77)/3);  //Change Distance HERE (21 to any other number. Keep other factors same
+        timetoMoveAfterTurn= (int)(200*(10+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same
         waitForStart();
 
         runtime.reset();
+        /****************************************************************************************
+        This code is disabled for 4-Nov as we are not going to use Jewel Knocker)
         while (runtime.milliseconds()    < 500) { //Move backward
             leftDrive.setPower(-powerValueforSpeedPlus);
             rightDrive.setPower(-powerValueforSpeedPlus);
@@ -121,7 +130,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
-     //   jewelServo.setPosition(-.60);
+        jewelServo.setPosition(-.60);
         jewelColor = colorSensor.red();
 
         runtime.reset();
@@ -144,7 +153,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
-//        jewelServo.setPosition(.60);
+        jewelServo.setPosition(.60);
 
         if (jewelColor >= 100) { //Red
             while (runtime.milliseconds() < 300) { //Turn back to original position
@@ -161,11 +170,6 @@ public abstract class Auto_Jewel extends LinearOpMode {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
-
-
-
-//Current program starts working here. Code before this will not execute.
-        powerValueforSpeedPlus=0.20;
         // Go Straight Ahead and out of Balancing Platform
         runtime.reset();
         while(runtime.milliseconds() < timetoMoveBeforeFirstTurn) { //Straight ahead for 4 second
@@ -190,31 +194,49 @@ public abstract class Auto_Jewel extends LinearOpMode {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
+         ***************************************************************************************/
+
+//Current program starts working here. Code before this will not execute.
+        powerValueforSpeedPlus=0.20;
+
         // Go Straight Ahead
         runtime.reset();
-        while(runtime.milliseconds() < 1000) { //Straight ahead for 4 seconds
+        while(runtime.milliseconds() < timetoMoveForwardFirst) {
             rightDrive.setPower(powerValueforSpeedPlus);
             leftDrive.setPower(powerValueforSpeedPlus);
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
-/*
+
         runtime.reset();
-        if (areWeFront) {
+        if (areWeFront) {//We need to Turn and go to the safe Zone
             if (areWeRed) {
-                while(runtime.milliseconds() < timeFor90DegreeTurnMs) { //Straight ahead for 4 second
+                while(runtime.milliseconds() < timeFor90DegreeTurnMs) {
                     rightDrive.setPower(-powerValueforSpeedPlus);
                     leftDrive.setPower(powerValueforSpeedPlus);
                 }
             }
             else {
-                while(runtime.milliseconds() < timeFor90DegreeTurnMs) { //Straight ahead for 4 second
+                while(runtime.milliseconds() < timeFor90DegreeTurnMs) {
                     leftDrive.setPower(-powerValueforSpeedPlus);
                     rightDrive.setPower(powerValueforSpeedPlus);
                 }
             }
+            leftDrive.setPower(0);
+            rightDrive.setPower(0);
+
+            runtime.reset();
+            while(runtime.milliseconds() < timetoMoveAfterTurn) { //Go Straight
+                rightDrive.setPower(powerValueforSpeedPlus);
+                leftDrive.setPower(powerValueforSpeedPlus);
+            }
+            leftDrive.setPower(0);
+            rightDrive.setPower(0);
         }
-*/
+
+        //Drop Glyph
+        armServo.setPosition(.5);
+
         rightDrive.setPower(0);
         leftDrive.setPower(0);
         requestOpModeStop();
