@@ -76,7 +76,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
     public void runOpModeMain() {
 
         double powerValueforSpeed;
-        int timeFor90DegreeTurnMs = 1325;
+        int timeFor90DegreeTurnMs = 1200;
         int timetoMoveForJewel;
         int timetoMoveForwardFirstFront;
         int timetoMoveForwardFirstValue;
@@ -116,7 +116,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
         */
 
         timetoMoveForwardFirstFront = (int)(200*(27+0.77)/3);  //Change Distance HERE (27 to any other number. Keep other factors same
-        timetoMoveForwardFirstRear = (int)(200*(10+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same
+        timetoMoveForwardFirstRear = (int)(200*(18+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same
         timetoMoveAfterTurnFront= (int)(200*(5+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same
         timetoAdjustRear= (int)(200*(1+0.77)/3);  //Change Distance HERE (1 to any other number. Keep other factors same
         timetoMoveForJewel= (int)(200*(3+0.77)/3);  //Change Distance HERE (3 to any other number. Keep other factors same
@@ -229,10 +229,13 @@ public abstract class Auto_Jewel extends LinearOpMode {
         // Go Straight Ahead
         telemetry.addData("Time", timetoMoveForwardFirstValue);    //
         telemetry.update();
+        //Hold Glyph
+        armServo.setPosition(.5);
+
         runtime.reset();
         while(runtime.milliseconds() < timetoMoveForwardFirstValue) {
-            rightDrive.setPower(Math.abs(powerValueforSpeed));
-            leftDrive.setPower(Math.abs(powerValueforSpeed));
+            rightDrive.setPower(Math.abs(powerValueforSpeed*1.2));
+            leftDrive.setPower(Math.abs(powerValueforSpeed*1.2));
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
