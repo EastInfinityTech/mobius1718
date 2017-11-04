@@ -290,6 +290,8 @@ public abstract class Auto_Jewel extends LinearOpMode {
 
         //Drop Glyph
         armServo.setPosition(-.5);
+        armServo.setPosition(-.5);
+        armServo.setPosition(-.5);
 
         rightDrive.setPower(0);
         leftDrive.setPower(0);
