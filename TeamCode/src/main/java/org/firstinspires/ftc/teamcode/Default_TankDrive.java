@@ -53,7 +53,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tank Drive", group="Iterative Opmode")
+@TeleOp(name="Default_TankDrive", group="Iterative Opmode")
 //@Disabled
 public class Default_TankDrive extends OpMode
 {
@@ -64,8 +64,12 @@ public class Default_TankDrive extends OpMode
     private Servo armServo = null;
     private DcMotor elevatorMotor = null;
     private Servo jewelServo = null;
-    boolean isArmOpen = true;
 
+    static final double INCREMENT   = 0.01;     // amount to ramp motor each CYCLE_MS cycle
+    static final double MAX_FWD     =  1.0;     // Maximum FWD power applied to motor
+    static final double MAX_REV     = -1.0;     // Maximum REV power applied to motor
+    double  power   = 0;
+    boolean rampUp  = true;
 
 
     /*
@@ -87,8 +91,8 @@ public class Default_TankDrive extends OpMode
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
         elevatorMotor.setDirection(DcMotor.Direction.FORWARD);
         armServo.setDirection(Servo.Direction.FORWARD);
         jewelServo.setDirection(Servo.Direction.FORWARD);
@@ -127,8 +131,6 @@ public class Default_TankDrive extends OpMode
         boolean elevatorDown;
         boolean armOpen;
         boolean armClose;
-        boolean jewelUp;
-        boolean jewelDown;
 
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
@@ -136,22 +138,39 @@ public class Default_TankDrive extends OpMode
         rightPower = gamepad1.right_stick_y;
         elevatorUp = gamepad1.dpad_up;
         elevatorDown = gamepad1.dpad_down;
-        armOpen = gamepad1.a;
-        armClose = gamepad1.x;
+        armOpen = gamepad1.x;
+        armClose = gamepad1.a;
 
 
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
+        if (Math.abs(leftPower + rightPower) >= .01) {
+            // Keep stepping up until we hit the max value.
+            power += INCREMENT ;
+            if (power >= MAX_FWD ) {
+                power = MAX_FWD;
+                rampUp = !rampUp;   // Switch ramp direction
+            }
+        }
+        else {
+            // Keep stepping down until we hit the min value.
+            power -= INCREMENT ;
+            if (power <= MAX_REV ) {
+                power = MAX_REV;
+                rampUp = !rampUp;  // Switch ramp direction
+            }
+        }
+
+        leftDrive.setPower(leftPower*power);
+        rightDrive.setPower(rightPower*power);
 
         //Elevator Mechanism
         if(elevatorUp){
-            elevatorMotor.setPower (.5);
+            elevatorMotor.setPower(1);
         }
         else if(elevatorDown){
-            elevatorMotor.setPower (-.5);
+            elevatorMotor.setPower(-1);
         }
         else {
-            elevatorMotor.setPower (0);
+            elevatorMotor.setPower(0);
         }
 
         //Glyph Mechanism
@@ -162,9 +181,10 @@ public class Default_TankDrive extends OpMode
             armServo.setPosition(-.5);
         }
 
+
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower*power, rightPower*power);
     }
 
     /*
