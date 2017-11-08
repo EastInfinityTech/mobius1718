@@ -83,7 +83,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
         int timetoMoveAfterTurnFront;
         int timetoMoveForwardFirstRear;
         int timetoAdjustRear;
-        int turnToKnockoffJewel=400;
+        int moveToKnockoffJewel=400;
         int knockOffSeenJewelFactor=1;
         /*
          * Initialize the drive system variables.
@@ -144,20 +144,8 @@ public abstract class Auto_Jewel extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
-        runtime.reset();
-        /****************************************************************************************
-        //This code is disabled for 4-Nov as we are not going to use Jewel Knocker)
-        runtime.reset();
-        while (runtime.milliseconds()    < timetoMoveForJewel) { //Move backward
-             rightDrive.setPower(-Math.abs(powerValueforSpeed));
-             leftDrive.setPower(-Math.abs(powerValueforSpeed));
-        }
-        telemetry.addData("Status", "Went Back now Put Servo Down.");    //
-        telemetry.update();
-
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
+        //Hold Glyph
+        armServo.setPosition(.5);
 
         jewelServo.setPosition(-.60);
         jewelColor = colorSensor.red();
@@ -180,9 +168,9 @@ public abstract class Auto_Jewel extends LinearOpMode {
          }
 
          runtime.reset();
-         while (runtime.milliseconds() < turnToKnockoffJewel) { //Turn in direction of oposite color jewel
+         while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn in direction of oposite color jewel
              rightDrive.setPower(knockOffSeenJewelFactor*.3);
-             leftDrive.setPower(knockOffSeenJewelFactor*-.3);
+             leftDrive.setPower(knockOffSeenJewelFactor*.3);
         }
 
         leftDrive.setPower(0);
@@ -191,46 +179,16 @@ public abstract class Auto_Jewel extends LinearOpMode {
         jewelServo.setPosition(.60);
 
         runtime.reset();
-        while (runtime.milliseconds() < turnToKnockoffJewel) { //Turn back to Original direction
+        while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn back to Original position
             rightDrive.setPower(knockOffSeenJewelFactor*-.3);
-            leftDrive.setPower(knockOffSeenJewelFactor*.3);
+            leftDrive.setPower(knockOffSeenJewelFactor*-.3);
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
-        // Come backto original position
-        runtime.reset();
-        while (runtime.milliseconds()    < timetoMoveForJewel) { //Move backward
-            rightDrive.setPower(Math.abs(powerValueforSpeed));
-            leftDrive.setPower(Math.abs(powerValueforSpeed));
-        }
-
-        // Go Straight Ahead and out of Balancing Platform
-        runtime.reset();
-        while(runtime.milliseconds() < timetoMoveAfterTurnFront) { ///to be changed with new variable
-            rightDrive.setPower(powerValueforSpeed);
-            leftDrive.setPower(powerValueforSpeed);
-        }
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-
-        // Turn to Left or Right
-        runtime.reset();
-        while(runtime.milliseconds() < timeFor90DegreeTurnMs) {
-            leftDrive.setPower(-powerValueforSpeed);
-            rightDrive.setPower(powerValueforSpeed);
-        }
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-
-         ***************************************************************************************/
-
-//Current program starts working here. Code before this will not execute.
-        // Go Straight Ahead
+     // Go Straight Ahead
         telemetry.addData("Time", timetoMoveForwardFirstValue);    //
         telemetry.update();
-        //Hold Glyph
-        armServo.setPosition(.5);
 
         runtime.reset();
         while(runtime.milliseconds() < timetoMoveForwardFirstValue) {
