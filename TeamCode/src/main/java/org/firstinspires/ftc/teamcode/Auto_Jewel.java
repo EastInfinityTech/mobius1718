@@ -83,8 +83,9 @@ public abstract class Auto_Jewel extends LinearOpMode {
         int timetoMoveAfterTurnFront;
         int timetoMoveForwardFirstRear;
         int timetoAdjustRear;
-        int moveToKnockoffJewel=400;
+        int moveToKnockoffJewel=250;
         int knockOffSeenJewelFactor=1;
+        double startJewelKnockerPosition=0;
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
@@ -147,23 +148,26 @@ public abstract class Auto_Jewel extends LinearOpMode {
         //Hold Glyph
         armServo.setPosition(.5);
 
-        jewelServo.setPosition(-.60);
+        jewelServo.setPosition(.6);
+        //wait for 1  sec
+        sleep(1000);
+
         jewelColor = colorSensor.red();
 
-        knockOffSeenJewelFactor=1;
+        knockOffSeenJewelFactor=-1;
         runtime.reset();
         if (jewelColor >= 100) { //Red
             telemetry.addData("Status", "I see Red Color Jewel.");    //
             telemetry.update();
             if (areWeRed) {
-                knockOffSeenJewelFactor = -1;
+                knockOffSeenJewelFactor = 1;
             }
         }
          else{ //Blue
-            telemetry.addData("Status", "I see Blue Color Jewel");    //
+            telemetry.addData("Status", "I see Blue Color Jewel");
             telemetry.update();
             if (!areWeRed) {
-                knockOffSeenJewelFactor=-1;
+                knockOffSeenJewelFactor=1;
             }
          }
 
@@ -176,7 +180,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
         leftDrive.setPower(0);
         rightDrive.setPower(0);
 
-        jewelServo.setPosition(.60);
+        jewelServo.setPosition(-.6);
 
         runtime.reset();
         while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn back to Original position
@@ -250,7 +254,6 @@ public abstract class Auto_Jewel extends LinearOpMode {
         armServo.setPosition(-.5);
         armServo.setPosition(-.5);
         armServo.setPosition(-.5);
-
         rightDrive.setPower(0);
         leftDrive.setPower(0);
         requestOpModeStop();
