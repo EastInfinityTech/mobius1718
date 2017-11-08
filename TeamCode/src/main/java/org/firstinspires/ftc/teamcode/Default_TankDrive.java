@@ -67,7 +67,7 @@ public class Default_TankDrive extends OpMode
 
     static final double INCREMENT   = 0.01;     // amount to ramp motor each CYCLE_MS cycle
     static final double MAX_FWD     =  1.0;     // Maximum FWD power applied to motor
-    static final double MAX_REV     = -1.0;     // Maximum REV power applied to motor
+    static final double MAX_REV     = 0;     // Maximum REV power applied to motor
     double  power   = 0;
     boolean rampUp  = true;
 
@@ -91,8 +91,8 @@ public class Default_TankDrive extends OpMode
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
         elevatorMotor.setDirection(DcMotor.Direction.FORWARD);
         armServo.setDirection(Servo.Direction.FORWARD);
         jewelServo.setDirection(Servo.Direction.FORWARD);
@@ -145,17 +145,15 @@ public class Default_TankDrive extends OpMode
         if (Math.abs(leftPower + rightPower) >= .01) {
             // Keep stepping up until we hit the max value.
             power += INCREMENT ;
-            if (power >= MAX_FWD ) {
-                power = MAX_FWD;
-                rampUp = !rampUp;   // Switch ramp direction
+            if (power >= 1 ) {
+                power = 1;
             }
         }
         else {
             // Keep stepping down until we hit the min value.
             power -= INCREMENT ;
-            if (power <= MAX_REV ) {
-                power = MAX_REV;
-                rampUp = !rampUp;  // Switch ramp direction
+            if (power <= .1 ) {
+                power = 0;
             }
         }
 
