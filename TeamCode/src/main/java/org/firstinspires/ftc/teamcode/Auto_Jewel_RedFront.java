@@ -50,9 +50,48 @@ public class Auto_Jewel_RedFront extends Auto_Jewel {
     @Override
     public void runOpMode() {
 
-        areWeRed = true;
-        areWeFront = true;
+        JewelColorType foundJewelColor= JewelColorType.unKnown;
+        telemetry.addData("Robot Placement Type:", "I am Red Front");    //
+        telemetry.update();
 
-        this.runOpModeMain();
+        initAutonRoutine();
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        //Hold Glyph
+        armServo.setPosition(.5);
+
+        jewelServo.setPosition(.6);
+        //wait for 1  sec
+        sleep(1000);
+
+        foundJewelColor =findJewelColorType();
+
+        if(foundJewelColor== JewelColorType.red){
+            moveInchesBack(3); //Knock the Jewel Off
+            jewelServo.setPosition(-.6);
+            //wait for 1  sec
+            sleep(1000);
+            moveInchesForward(2); //Come back but avoid knocking off your jewel
+        }
+        else if(foundJewelColor== JewelColorType.blue){
+            moveInchesForward(3); //Knock the Jewel Off
+            jewelServo.setPosition(-.6);
+            //wait for 1  sec
+            sleep(1000);
+            moveInchesBack(2);//Come back but avoid knocking off your jewel
+        }
+        else{
+            jewelServo.setPosition(-.6);
+            //wait for 1  sec
+            sleep(1000);
+        }
+
+        moveInchesForward(24);
+        turnRight();
+        moveInchesForward(5);
+
+        endAutonRoutine();
+
     }
 }

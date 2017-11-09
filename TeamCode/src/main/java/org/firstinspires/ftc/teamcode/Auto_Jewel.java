@@ -60,42 +60,114 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
+
 //@Disabled
 public abstract class Auto_Jewel extends LinearOpMode {
+
+    public enum JewelColorType{unKnown,red,blue};
 
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
-    private ColorSensor colorSensor = null;
-    private Servo jewelServo = null;
-    private Servo armServo = null;
-    protected boolean areWeRed = false;
-    protected boolean areWeFront = false;
-    public void runOpModeMain() {
+    protected ColorSensor colorSensor = null;
+    protected Servo jewelServo = null;
+    protected Servo armServo = null;
 
-        double powerValueforSpeed;
-        int timeFor90DegreeTurnMs = 1200;
-        int timetoMoveForJewel;
-        int timetoMoveForwardFirstFront;
-        int timetoMoveForwardFirstValue;
-        int timetoMoveAfterTurnFront;
-        int timetoMoveForwardFirstRear;
-        int timetoAdjustRear;
-        int moveToKnockoffJewel=250;
-        int timetoMoveBackwardFirstValue;
-        int knockOffSeenJewelFactor=1;
+    private void moveInches(int inchToMove, boolean moveForward){
+        /* These are our observations for the relationship between time and distance travelled.
+        *  If we assume this to be distance = Time * Factor + Constant
+        *  Here Constant is the offset for the inital momentum
+        *  Readings are as below on the test field:
+        *  1000Ms we go between 14 1/4 to 14 1/2 inches (5 samples)
+        *  2000Ms we go between 28 7/8 to  29 3/8 inches
+        *  3000 Ms we go 44 3/8 inches
+        *
+        *  With Approximation we get Time = 200/3 * (distance+0.77)
+        *  These are with Power Value 0.20
+        */
+
+        int timetoMove = (int)(200*(inchToMove+0.77)/3);  //Change Distance HERE (27 to any other number. Keep other factors same)
+
+        double powerValueforSpeed = 0.20;
+        if(!moveForward){
+            powerValueforSpeed*=-1;
+        }
+
+        runtime.reset();
+        while (runtime.milliseconds() < timetoMove) {
+            rightDrive.setPower(powerValueforSpeed);
+            leftDrive.setPower(powerValueforSpeed);
+        }
+
+        rightDrive.setPower(0);
+        leftDrive.setPower(0);
+
+        telemetry.addData("Time Moved:", timetoMove);
+        telemetry.update();
+    }
+
+    protected void moveInchesForward(int inchToMove){
+        moveInches(inchToMove,true);
+    }
+
+    protected void moveInchesBack(int inchToMove){
+        moveInches(inchToMove,false);
+    }
+
+    protected void turnRight() {
+        runtime.reset();
+        while(runtime.milliseconds() < 1200) {
+            leftDrive.setPower(.25);
+            rightDrive.setPower(0);
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+    }
+
+    protected void turnLeft() {
+        runtime.reset();
+        while(runtime.milliseconds() < 1200) {
+            leftDrive.setPower(0);
+            rightDrive.setPower(0.25);
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+    }
+
+    protected JewelColorType findJewelColorType(){
+        JewelColorType myJewelColor = JewelColorType.unKnown;
         int jewelRedColor;
         int jewelBlueColor;
-        boolean foundRedJewel;
-        boolean foundBlueJewel;
+        jewelRedColor = colorSensor.red();
+        jewelBlueColor = colorSensor.blue();
 
-        double startJewelKnockerPosition=0;
+        if (jewelRedColor>100 & jewelBlueColor<100)
+        {
+            myJewelColor = JewelColorType.red;
+            telemetry.addData("Status", "I see Red Color Jewel.");    //
+            telemetry.update();
+        }
+        else if (jewelRedColor<100 & jewelBlueColor>100)
+        {
+            myJewelColor = JewelColorType.blue;
+            telemetry.addData("Status", "I see Blue Color Jewel.");    //
+            telemetry.update();
+        }
+        else
+        {
+            myJewelColor = JewelColorType.unKnown;
+            telemetry.addData("Status", "I see some problem. Not found a color.");    //
+            telemetry.update();
+        }
+        return myJewelColor;
+    }
+
+    protected void initAutonRoutine()
+    {
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        telemetry.addData("Status", "In the Common Routine");    //
-        telemetry.update();
         leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         armServo = hardwareMap.get(Servo.class, "armServo");
@@ -108,181 +180,9 @@ public abstract class Auto_Jewel extends LinearOpMode {
 
         telemetry.addData("Status",  "Ready to run");    //
         telemetry.update();
+    }
 
-        /* These are our observations for the relationship between time and distance travelled.
-        *  If we assume this to be distance = Time * Factor + Constant
-        *  Here Constant is the offset for the inital momentum
-        *  Readings are as below on the test field:
-        *  1000Ms we go between 14 1/4 to 14 1/2 inches (5 samples)
-        *  2000Ms we go between 28 7/8 to  29 3/8 inches
-        *  3000 Ms we go 44 3/8 inches
-        *
-        *  With Approximation we get Time = 200/3 * (distance+0.77)
-        */
-
-        timetoMoveForwardFirstFront = (int)(200*(27+0.77)/3);  //Change Distance HERE (27 to any other number. Keep other factors same)
-        timetoMoveForwardFirstRear = (int)(200*(18+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same)
-        timetoMoveAfterTurnFront= (int)(200*(5+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same)
-        timetoAdjustRear= (int)(200*(1+0.77)/3);  //Change Distance HERE (1 to any other number. Keep other factors same)
-        timetoMoveForJewel= (int)(200*(3+0.77)/3);  //Change Distance HERE (3 to any other number. Keep other factors same)
-        timetoMoveBackwardFirstValue= (int)(200*(24+0.77)/3);// Change Distance HERE(if you are changing forward keep other factors same)
-
-        powerValueforSpeed=0.20;
-        if (areWeFront) {
-            timetoMoveForwardFirstValue = timetoMoveForwardFirstFront;
-            telemetry.addData("Robot Placement Type:", "I am Front");    //
-            telemetry.update();
-        }
-        else {
-            timetoMoveForwardFirstValue = timetoMoveForwardFirstRear;
-            telemetry.addData("Robot Placement Type:", "I am Back");    //
-            telemetry.update();
-        }
-        if (areWeRed) {
-            powerValueforSpeed = powerValueforSpeed*-1; //Reverse the Power Value to take care of Turn Type for Red
-            telemetry.addData("Team Color:", "Red");    //
-            telemetry.update();
-        }
-        else {
-            telemetry.addData("Team Color:", "Blue");    //
-            telemetry.update();
-        }
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        //Hold Glyph
-        armServo.setPosition(.5);
-
-        jewelServo.setPosition(.6);
-        //wait for 1  sec
-        sleep(1000);
-
-        jewelRedColor = colorSensor.red();
-        jewelBlueColor = colorSensor.blue();
-
-        foundRedJewel=false;
-        foundBlueJewel=false;
-
-        if (jewelRedColor>100 & jewelBlueColor<100)
-        {
-            foundRedJewel = true;
-        }
-        if (jewelRedColor<100 & jewelBlueColor>100)
-        {
-            foundBlueJewel = true;
-        }
-
-        knockOffSeenJewelFactor=-1;
-        runtime.reset();
-        if (foundRedJewel) {
-            telemetry.addData("Status", "I see Red Color Jewel.");    //
-            telemetry.update();
-            if (areWeRed) {
-                knockOffSeenJewelFactor = 1;
-            }
-        }
-            else if(foundBlueJewel){
-            telemetry.addData("Status", "I see Blue Color Jewel");
-            telemetry.update();
-            if (areWeRed) {
-                //! means false
-                knockOffSeenJewelFactor=1;
-            }
-         }
-         else {
-                    telemetry.addData("Status", "False Color Call for Jewel");
-                    telemetry.update();
-                        knockOffSeenJewelFactor=0;
-
-                }
-
-         runtime.reset();
-         while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn in direction of opposite color jewel
-             rightDrive.setPower(knockOffSeenJewelFactor*.3);
-             leftDrive.setPower(knockOffSeenJewelFactor*.3);
-        }
-
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-
-        jewelServo.setPosition(-.6);
-
-        runtime.reset();
-        while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn back to Original position
-            rightDrive.setPower(knockOffSeenJewelFactor*-.3);
-            leftDrive.setPower(knockOffSeenJewelFactor*-.3);
-        }
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-
-     // Go Straight Ahead
-
-        telemetry.addData("Time", timetoMoveForwardFirstValue);    //
-        telemetry.update();
-
-        if(areWeRed) {
-            runtime.reset();
-            while (runtime.milliseconds() < timetoMoveForwardFirstValue) {
-                rightDrive.setPower(Math.abs(powerValueforSpeed * 1.2));
-                leftDrive.setPower(Math.abs(powerValueforSpeed * 1.2));
-            }
-        }
-        else{
-            runtime.reset();
-            while(runtime.milliseconds() < timetoMoveBackwardFirstValue) {
-                rightDrive.setPower(Math.abs(powerValueforSpeed * -1.2));
-                leftDrive.setPower(Math.abs(powerValueforSpeed * -1.2));
-        }
-
-        }
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-
-        if (areWeFront) {//We need to Turn and go to the safe Zone
-            runtime.reset();
-            while(runtime.milliseconds() < timeFor90DegreeTurnMs) {
-                leftDrive.setPower(-powerValueforSpeed);
-                rightDrive.setPower(powerValueforSpeed);
-            }
-            leftDrive.setPower(0);
-            rightDrive.setPower(0);
-
-            runtime.reset();
-            while(runtime.milliseconds() < timetoMoveAfterTurnFront) { //Go Straight
-                rightDrive.setPower(Math.abs(powerValueforSpeed));
-                leftDrive.setPower(Math.abs(powerValueforSpeed));
-            }
-            leftDrive.setPower(0);
-            rightDrive.setPower(0);
-        }
-        else{//Turn other way to set position
-            runtime.reset();
-            while(runtime.milliseconds() < timeFor90DegreeTurnMs) {
-                leftDrive.setPower(powerValueforSpeed);
-                rightDrive.setPower(-powerValueforSpeed);
-            }
-            leftDrive.setPower(0);
-            rightDrive.setPower(0);
-
-            runtime.reset();
-            while(runtime.milliseconds() < timetoAdjustRear) {
-                rightDrive.setPower(Math.abs(powerValueforSpeed));
-                leftDrive.setPower(Math.abs(powerValueforSpeed));
-            }
-            leftDrive.setPower(0);
-            rightDrive.setPower(0);
-
-            //Turn again to put Glyph
-            runtime.reset();
-            while(runtime.milliseconds() < timeFor90DegreeTurnMs) {
-                leftDrive.setPower(-powerValueforSpeed);
-                rightDrive.setPower(powerValueforSpeed);
-            }
-            leftDrive.setPower(0);
-            rightDrive.setPower(0);
-
-        }
-
+    protected void endAutonRoutine(){
         telemetry.addData("Status", "Time to Open the Arms...");    //
         telemetry.update();
 
@@ -290,9 +190,12 @@ public abstract class Auto_Jewel extends LinearOpMode {
         armServo.setPosition(-.5);
         armServo.setPosition(-.5);
         armServo.setPosition(-.5);
+
         rightDrive.setPower(0);
         leftDrive.setPower(0);
+
         requestOpModeStop();
         sleep(1000);
+
     }
 }
