@@ -45,7 +45,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 @Autonomous(name="Auto: Blue Front", group="Auton")
 //@Disabled
-public class Auto_Jewel_BlueFront extends Auto_Jewel {
+public class Auto_Jewel_BlueFront extends Auto_Jewel  {
 
     @Override
     public void runOpMode() {

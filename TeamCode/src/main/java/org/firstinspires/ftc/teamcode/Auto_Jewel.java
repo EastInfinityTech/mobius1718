@@ -69,10 +69,8 @@ public abstract class Auto_Jewel extends LinearOpMode {
     private ColorSensor colorSensor = null;
     private Servo jewelServo = null;
     private Servo armServo = null;
-    private int jewelColor;
     protected boolean areWeRed = false;
     protected boolean areWeFront = false;
-
     public void runOpModeMain() {
 
         double powerValueforSpeed;
@@ -84,7 +82,13 @@ public abstract class Auto_Jewel extends LinearOpMode {
         int timetoMoveForwardFirstRear;
         int timetoAdjustRear;
         int moveToKnockoffJewel=250;
+        int timetoMoveBackwardFirstValue;
         int knockOffSeenJewelFactor=1;
+        int jewelRedColor;
+        int jewelBlueColor;
+        boolean foundRedJewel;
+        boolean foundBlueJewel;
+
         double startJewelKnockerPosition=0;
         /*
          * Initialize the drive system variables.
@@ -116,11 +120,12 @@ public abstract class Auto_Jewel extends LinearOpMode {
         *  With Approximation we get Time = 200/3 * (distance+0.77)
         */
 
-        timetoMoveForwardFirstFront = (int)(200*(27+0.77)/3);  //Change Distance HERE (27 to any other number. Keep other factors same
-        timetoMoveForwardFirstRear = (int)(200*(18+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same
-        timetoMoveAfterTurnFront= (int)(200*(5+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same
-        timetoAdjustRear= (int)(200*(1+0.77)/3);  //Change Distance HERE (1 to any other number. Keep other factors same
-        timetoMoveForJewel= (int)(200*(3+0.77)/3);  //Change Distance HERE (3 to any other number. Keep other factors same
+        timetoMoveForwardFirstFront = (int)(200*(27+0.77)/3);  //Change Distance HERE (27 to any other number. Keep other factors same)
+        timetoMoveForwardFirstRear = (int)(200*(18+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same)
+        timetoMoveAfterTurnFront= (int)(200*(5+0.77)/3);  //Change Distance HERE (10 to any other number. Keep other factors same)
+        timetoAdjustRear= (int)(200*(1+0.77)/3);  //Change Distance HERE (1 to any other number. Keep other factors same)
+        timetoMoveForJewel= (int)(200*(3+0.77)/3);  //Change Distance HERE (3 to any other number. Keep other factors same)
+        timetoMoveBackwardFirstValue= (int)(200*(24+0.77)/3);// Change Distance HERE(if you are changing forward keep other factors same)
 
         powerValueforSpeed=0.20;
         if (areWeFront) {
@@ -152,27 +157,47 @@ public abstract class Auto_Jewel extends LinearOpMode {
         //wait for 1  sec
         sleep(1000);
 
-        jewelColor = colorSensor.red();
+        jewelRedColor = colorSensor.red();
+        jewelBlueColor = colorSensor.blue();
+
+        foundRedJewel=false;
+        foundBlueJewel=false;
+
+        if (jewelRedColor>100 & jewelBlueColor<100)
+        {
+            foundRedJewel = true;
+        }
+        if (jewelRedColor<100 & jewelBlueColor>100)
+        {
+            foundBlueJewel = true;
+        }
 
         knockOffSeenJewelFactor=-1;
         runtime.reset();
-        if (jewelColor >= 100) { //Red
+        if (foundRedJewel) {
             telemetry.addData("Status", "I see Red Color Jewel.");    //
             telemetry.update();
             if (areWeRed) {
                 knockOffSeenJewelFactor = 1;
             }
         }
-         else{ //Blue
+            else if(foundBlueJewel){
             telemetry.addData("Status", "I see Blue Color Jewel");
             telemetry.update();
-            if (!areWeRed) {
+            if (areWeRed) {
+                //! means false
                 knockOffSeenJewelFactor=1;
             }
          }
+         else {
+                    telemetry.addData("Status", "False Color Call for Jewel");
+                    telemetry.update();
+                        knockOffSeenJewelFactor=0;
+
+                }
 
          runtime.reset();
-         while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn in direction of oposite color jewel
+         while (runtime.milliseconds() < moveToKnockoffJewel) { //Turn in direction of opposite color jewel
              rightDrive.setPower(knockOffSeenJewelFactor*.3);
              leftDrive.setPower(knockOffSeenJewelFactor*.3);
         }
@@ -191,13 +216,24 @@ public abstract class Auto_Jewel extends LinearOpMode {
         rightDrive.setPower(0);
 
      // Go Straight Ahead
+
         telemetry.addData("Time", timetoMoveForwardFirstValue);    //
         telemetry.update();
 
-        runtime.reset();
-        while(runtime.milliseconds() < timetoMoveForwardFirstValue) {
-            rightDrive.setPower(Math.abs(powerValueforSpeed*1.2));
-            leftDrive.setPower(Math.abs(powerValueforSpeed*1.2));
+        if(areWeRed) {
+            runtime.reset();
+            while (runtime.milliseconds() < timetoMoveForwardFirstValue) {
+                rightDrive.setPower(Math.abs(powerValueforSpeed * 1.2));
+                leftDrive.setPower(Math.abs(powerValueforSpeed * 1.2));
+            }
+        }
+        else{
+            runtime.reset();
+            while(runtime.milliseconds() < timetoMoveBackwardFirstValue) {
+                rightDrive.setPower(Math.abs(powerValueforSpeed * -1.2));
+                leftDrive.setPower(Math.abs(powerValueforSpeed * -1.2));
+        }
+
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);

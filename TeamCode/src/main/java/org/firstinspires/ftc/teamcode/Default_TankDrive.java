@@ -142,7 +142,7 @@ public class Default_TankDrive extends OpMode
         armClose = gamepad1.a;
 
 
-        if (Math.abs(leftPower + rightPower) >= .01) {
+        if (Math.abs(leftPower) + Math.abs(rightPower) >= .01) {
             // Keep stepping up until we hit the max value.
             power += INCREMENT ;
             if (power >= 1 ) {
