@@ -116,49 +116,54 @@ public abstract class Auto_Jewel extends LinearOpMode {
 
     protected void turnRight() {
         runtime.reset();
-        while(runtime.milliseconds() < 1200) {
+        while(runtime.milliseconds() < 1400) {
             leftDrive.setPower(.25);
-            rightDrive.setPower(0);
+            rightDrive.setPower(-.25);
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
+        telemetry.addData("I Turned Right", 90);
+        telemetry.update();
     }
 
     protected void turnLeft() {
         runtime.reset();
-        while(runtime.milliseconds() < 1200) {
-            leftDrive.setPower(0);
+        while(runtime.milliseconds() < 1400) {
+            leftDrive.setPower(-0.25);
             rightDrive.setPower(0.25);
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
+        telemetry.addData("I Turned Left:", 90);
+        telemetry.update();
     }
 
     protected JewelColorType findJewelColorType(){
         JewelColorType myJewelColor = JewelColorType.unKnown;
         int jewelRedColor;
         int jewelBlueColor;
+        String strTest="";
         jewelRedColor = colorSensor.red();
         jewelBlueColor = colorSensor.blue();
-
-        if (jewelRedColor>100 & jewelBlueColor<100)
+        strTest = "Red Value:#" + String.valueOf(jewelRedColor) + "#, Blue Value:#"+ String.valueOf(jewelBlueColor)+"#";
+        if (jewelRedColor>60)
         {
             myJewelColor = JewelColorType.red;
-            telemetry.addData("Status", "I see Red Color Jewel.");    //
-            telemetry.update();
+            strTest = "I call Red: " + strTest;
         }
-        else if (jewelRedColor<100 & jewelBlueColor>100)
+        else if (jewelBlueColor>60)
         {
             myJewelColor = JewelColorType.blue;
-            telemetry.addData("Status", "I see Blue Color Jewel.");    //
-            telemetry.update();
+            strTest = "I call Blue: " + strTest;
         }
         else
         {
             myJewelColor = JewelColorType.unKnown;
-            telemetry.addData("Status", "I see some problem. Not found a color.");    //
-            telemetry.update();
+            strTest = "I DO NOT KNOW what to DO: " + strTest;
         }
+        telemetry.addData("Color Value:", strTest);    //
+        telemetry.update();
+
         return myJewelColor;
     }
 
@@ -190,6 +195,8 @@ public abstract class Auto_Jewel extends LinearOpMode {
         armServo.setPosition(-.5);
         armServo.setPosition(-.5);
         armServo.setPosition(-.5);
+        sleep(1000);
+        moveInchesBack(1);
 
         rightDrive.setPower(0);
         leftDrive.setPower(0);

@@ -99,6 +99,8 @@ public class Default_TankDrive extends OpMode
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
+
+        jewelServo.setPosition(-.6);
     }
 
     /*
@@ -136,10 +138,10 @@ public class Default_TankDrive extends OpMode
         // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
         leftPower  = gamepad1.left_stick_y;
         rightPower = gamepad1.right_stick_y;
-        elevatorUp = gamepad1.dpad_up;
-        elevatorDown = gamepad1.dpad_down;
-        armOpen = gamepad1.x;
-        armClose = gamepad1.a;
+        elevatorUp = gamepad2.dpad_up;
+        elevatorDown = gamepad2.dpad_down;
+        armOpen = gamepad2.x;
+        armClose = gamepad2.a;
 
 
         if (Math.abs(leftPower) + Math.abs(rightPower) >= .01) {

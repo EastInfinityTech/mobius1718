@@ -68,11 +68,11 @@ public class Auto_Jewel_BlueFront extends Auto_Jewel  {
         foundJewelColor =findJewelColorType();
 
         if(foundJewelColor== JewelColorType.red){
-            moveInchesBack(3); //Knock the Jewel Off
+            moveInchesBack(4); //Knock the Jewel Off
             jewelServo.setPosition(-.6);
             //wait for 1  sec
             sleep(1000);
-            moveInchesForward(2); //Come back but avoid knocking off your jewel
+            moveInchesForward(3); //Come back but avoid knocking off your jewel
         }
         else if(foundJewelColor== JewelColorType.blue){
             moveInchesForward(3); //Knock the Jewel Off
@@ -87,9 +87,9 @@ public class Auto_Jewel_BlueFront extends Auto_Jewel  {
             sleep(1000);
         }
 
-        moveInchesBack(27);
+        moveInchesBack(44);
         turnRight();
-        moveInchesForward(5);
+        moveInchesForward(6);
 
         endAutonRoutine();
 
