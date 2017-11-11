@@ -138,10 +138,23 @@ public class Default_TankDrive extends OpMode
         // - This requires no math, but it is hard to drive forward :0 slowly and keep straight.
         leftPower  = gamepad1.left_stick_y;
         rightPower = gamepad1.right_stick_y;
-        elevatorUp = gamepad2.dpad_up;
-        elevatorDown = gamepad2.dpad_down;
-        armOpen = gamepad2.x;
-        armClose = gamepad2.a;
+
+        elevatorUp=false;
+        elevatorDown=false;
+        if (gamepad1.right_trigger>0) {
+            elevatorUp = true;
+            //elevatorUp = gamepad1.dpad_up;
+        }
+        else if (gamepad1.left_trigger>0) {
+            elevatorDown =true;
+             //elevatorDown = gamepad1.dpad_down;
+        }
+
+        armOpen = gamepad1.left_bumper;
+        armClose =gamepad1.right_bumper;
+
+        //armOpen = gamepad1.x;
+        //armClose = gamepad1.a;
 
 
         if (Math.abs(leftPower) + Math.abs(rightPower) >= .01) {
