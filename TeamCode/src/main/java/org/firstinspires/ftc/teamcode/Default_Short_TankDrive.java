@@ -59,15 +59,15 @@ public class Default_Short_TankDrive extends OpMode
 {
     // Declare OpMode members.
 
-    private DcMotor leftDriveMotor=null;
-    private DcMotor rightDriveMotor=null;
-    private DcMotor leftLiftMotor=null;
-    private DcMotor rightLiftMotor=null;
+//    private DcMotor leftDriveMotor=null;
+//    private DcMotor rightDriveMotor=null;
+//    private DcMotor leftLiftMotor=null;
+//    private DcMotor rightLiftMotor=null;
     private DcMotor leftConveyorMotor=null;
     private DcMotor rightConveyorMotor=null;
-    private DcMotor relicMotor=null;
-    private Servo relicClampServo=null;
-    private Servo relicArmServo=null;
+//    private DcMotor relicMotor=null;
+//    private Servo relicClampServo=null;
+//    private Servo relicArmServo=null;
     private Servo leftFlipServo=null;
     private Servo rightFlipServo=null;
 
@@ -83,7 +83,7 @@ public class Default_Short_TankDrive extends OpMode
 
 //        leftDriveMotor=hardwareMap.get(DcMotor.class, "leftDriveMotor");
 //        rightDriveMotor=hardwareMap.get(DcMotor.class, "rightDriveMotor");
-        leftLiftMotor=hardwareMap.get(DcMotor.class, "leftLiftMotor");
+//        leftLiftMotor=hardwareMap.get(DcMotor.class, "leftLiftMotor");
 //        rightLiftMotor=hardwareMap.get(DcMotor.class, "rightLiftMotor");
         leftConveyorMotor=hardwareMap.get(DcMotor.class, "leftConveyorMotor");
         rightConveyorMotor=hardwareMap.get(DcMotor.class, "rightConveyorMotor");
@@ -91,22 +91,22 @@ public class Default_Short_TankDrive extends OpMode
         rightFlipServo=hardwareMap.get(Servo.class, "rightFlipServo");
 //        relicMotor=hardwareMap.get(DcMotor.class, "relicMotor");
 //       relicClampServo=hardwareMap.get(Servo.class, "relicClampServo");
-        relicArmServo=hardwareMap.get(Servo.class, "relicArmServo");
+//        relicArmServo=hardwareMap.get(Servo.class, "relicArmServo");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
 
  //       leftDriveMotor.setDirection(DcMotor.Direction.FORWARD);
  //       rightDriveMotor.setDirection(DcMotor.Direction.REVERSE);
-        leftLiftMotor.setDirection(DcMotor.Direction.FORWARD);
+ //       leftLiftMotor.setDirection(DcMotor.Direction.FORWARD);
  //       rightLiftMotor.setDirection(DcMotor.Direction.REVERSE);
-        leftConveyorMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightConveyorMotor.setDirection(DcMotor.Direction.FORWARD);
-        leftFlipServo.setDirection(Servo.Direction.FORWARD);
-        rightFlipServo.setDirection(Servo.Direction.REVERSE);
+        leftConveyorMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightConveyorMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftFlipServo.setDirection(Servo.Direction.REVERSE);
+        rightFlipServo.setDirection(Servo.Direction.FORWARD);
 //        relicMotor.setDirection(DcMotor.Direction.FORWARD);
 //        relicClampServo.setDirection(Servo.Direction.FORWARD);
-        relicArmServo.setDirection(Servo.Direction.FORWARD);
+//        relicArmServo.setDirection(Servo.Direction.FORWARD);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "It Worked!");
@@ -202,12 +202,12 @@ public class Default_Short_TankDrive extends OpMode
 
         // Flip the plate only off or on (Need to see if control to control position is required later
         if(flipServoON){
-            rightFlipServo.setPosition(0.5);
-            leftFlipServo.setPosition(0.5);
+            rightFlipServo.setPosition(-0.3);
+            leftFlipServo.setPosition(-0.3);
         }
         else{
-            rightFlipServo.setPosition(0);
-            leftFlipServo.setPosition(0);
+            rightFlipServo.setPosition(0.3);
+            leftFlipServo.setPosition(0.3);
         }
 
         //Lets have Conveyor Motor run only on and off. No need to control the speed
@@ -228,14 +228,14 @@ public class Default_Short_TankDrive extends OpMode
         else{
             relicClampServo.setPosition(0);`
         }
-*/
+
         if(relicArmServoON){
             relicArmServo.setPosition(0.7);
         }
         else {
             relicArmServo.setPosition(0);
         }
-
+*/
 //  private DcMotor relicMotor=null;= up and down
 //  private Servo relicArmServo=null;= forward and backward
 
@@ -250,8 +250,8 @@ public class Default_Short_TankDrive extends OpMode
     // Set power=0 for all motors and servos
     @Override
     public void stop() {
-        leftDriveMotor.setPower(0);
-        rightDriveMotor.setPower(0);
+//        leftDriveMotor.setPower(0);
+//        rightDriveMotor.setPower(0);
     }
 
     private void printButtonTraceValaues()

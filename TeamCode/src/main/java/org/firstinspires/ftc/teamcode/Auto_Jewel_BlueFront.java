@@ -61,8 +61,6 @@ public class Auto_Jewel_BlueFront extends Auto_Jewel  {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        //Hold Glyph
-        armServo.setPosition(.5);
 
         vuCipherMark=processCipher();
         if (vuCipherMark == RelicRecoveryVuMark.LEFT) {
@@ -102,12 +100,16 @@ public class Auto_Jewel_BlueFront extends Auto_Jewel  {
             sleep(1000);
         }
 
+        encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
+/*
         moveInchesBack(44+inchToAdjust);
 
         turnRight();
         moveInchesForward(6);
-
+*/
         endAutonRoutine();
     }
 }

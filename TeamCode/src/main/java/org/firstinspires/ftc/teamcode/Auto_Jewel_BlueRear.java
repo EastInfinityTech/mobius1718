@@ -61,8 +61,6 @@ public class Auto_Jewel_BlueRear extends Auto_Jewel {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        //Hold Glyph
-        armServo.setPosition(.5);
         vuCipherMark=processCipher();
         if (vuCipherMark == RelicRecoveryVuMark.LEFT) {
             inchToAdjust = 5;

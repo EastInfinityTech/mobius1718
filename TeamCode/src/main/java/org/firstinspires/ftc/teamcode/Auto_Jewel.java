@@ -81,13 +81,22 @@ public abstract class Auto_Jewel extends LinearOpMode {
     public enum JewelColorType{unKnown,red,blue};
 
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-    protected ColorSensor colorSensor = null;
+    private DcMotor leftDrive=null;
+    private DcMotor rightDrive=null;
+    private Servo leftFlipServo=null;
+    private Servo rightFlipServo=null;
     protected Servo jewelServo = null;
-    protected Servo armServo = null;
+    private ColorSensor colorSensor=null;
+
     private VuforiaTrackables relicTrackables=null;
     private VuforiaTrackable relicTemplate=null;
+    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -196,14 +205,29 @@ public abstract class Auto_Jewel extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
-        rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
-        armServo = hardwareMap.get(Servo.class, "armServo");
-        jewelServo = hardwareMap.get(Servo.class, "jewelServo");
-        colorSensor = hardwareMap.get(ColorSensor.class,"ColorSensor");
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
-        jewelServo.setDirection(Servo.Direction.FORWARD);
+        leftDrive=hardwareMap.get(DcMotor.class, "leftDriveMotor");
+        rightDrive=hardwareMap.get(DcMotor.class, "rightDriveMotor");
+        leftFlipServo=hardwareMap.get(Servo.class, "leftFlipServo");
+        rightFlipServo=hardwareMap.get(Servo.class, "rightFlipServo");
+        jewelServo=hardwareMap.get(Servo.class, "jewelKnocker");
+        colorSensor=hardwareMap.get(ColorSensor.class,"ColorSensor");
+
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Status", "Resetting Encoders");    //
+        telemetry.update();
+
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Send telemetry message to indicate successful Encoder reset
+        telemetry.addData("Path0",  "Starting at %7d :%7d",
+                leftDrive.getCurrentPosition(),
+                rightDrive.getCurrentPosition());
+        telemetry.update();
+
         // Send telemetry message to signify robot waiting; Can I check in
 
          /*
@@ -243,13 +267,9 @@ public abstract class Auto_Jewel extends LinearOpMode {
     }
 
     protected void endAutonRoutine(){
-        telemetry.addData("Status", "Time to Open the Arms...");    //
+        telemetry.addData("Status", "Time to stop at Home...");    //
         telemetry.update();
 
-        //Drop Glyph
-        armServo.setPosition(-.5);
-        armServo.setPosition(-.5);
-        armServo.setPosition(-.5);
         sleep(1000);
         moveInchesBack(1);
 
@@ -265,7 +285,7 @@ public abstract class Auto_Jewel extends LinearOpMode {
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
         relicTrackables.activate();
 
-        //Try focussing for 2 seconds and find the cipher
+        //Try focusing for 2 seconds and find the cipher
         runtime.reset();
         while(runtime.milliseconds() < 4000) {
             vuMark = RelicRecoveryVuMark.from(relicTemplate);
@@ -280,5 +300,68 @@ public abstract class Auto_Jewel extends LinearOpMode {
         }
         telemetry.update();
         return vuMark;
+        }
+
+    /*
+     *  Method to perfmorm a relative move, based on encoder counts.
+     *  Encoders are not reset as the move is based on the current position.
+     *  Move will stop if any of three conditions occur:
+     *  1) Move gets to the desired position
+     *  2) Move runs out of time
+     *  3) Driver stops the opmode running.
+     */
+    protected void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+        int newLeftTarget;
+        int newRightTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = leftDrive.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newRightTarget = rightDrive.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            leftDrive.setTargetPosition(newLeftTarget);
+            rightDrive.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            leftDrive.setPower(Math.abs(speed));
+            rightDrive.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (leftDrive.isBusy() && rightDrive.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        leftDrive.getCurrentPosition(),
+                        rightDrive.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            leftDrive.setPower(0);
+            rightDrive.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
     }
+
 }
